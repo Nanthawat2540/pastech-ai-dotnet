@@ -11,6 +11,7 @@ public static class ApplicationExtensions
         services.AddScoped<MemoryService>();
         services.AddScoped<SummaryService>();
         services.AddScoped<ChatOrchestrator>();
+        services.AddScoped<RoomBookingOrchestrator>();
         return services;
     }
 }

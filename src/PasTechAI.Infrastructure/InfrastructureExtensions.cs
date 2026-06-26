@@ -25,6 +25,7 @@ public static class InfrastructureExtensions
         services.AddSingleton<IChatRepository>(_ => new ChatRepository(connStr));
         services.AddSingleton<IMemoryRepository>(_ => new MemoryRepository(connStr));
         services.AddSingleton<ISummaryRepository>(_ => new SummaryRepository(connStr));
+        services.AddSingleton<IRoomRepository>(_ => new RoomRepository(connStr));
 
         // Ollama HTTP client
         services.AddHttpClient<IOllamaClient, OllamaClient>(c =>

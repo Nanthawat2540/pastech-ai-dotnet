@@ -43,6 +43,40 @@ public class DbInitializer(string connectionString)
             );
             IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name='IX_Summary_User')
                 CREATE INDEX IX_Summary_User ON ConversationSummary(UserId);
+
+            IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Rooms' AND xtype='U')
+            BEGIN
+                CREATE TABLE Rooms (
+                    Id          INT IDENTITY PRIMARY KEY,
+                    Name        NVARCHAR(100) NOT NULL,
+                    Location    NVARCHAR(200) NOT NULL,
+                    Capacity    INT NOT NULL,
+                    Description NVARCHAR(500) NULL,
+                    IsActive    BIT NOT NULL DEFAULT 1
+                );
+                INSERT INTO Rooms (Name, Location, Capacity, Description) VALUES
+                    (N'ห้องประชุม A', N'ชั้น 2', 10, N'ห้องประชุมขนาดกลาง'),
+                    (N'ห้องประชุม B', N'ชั้น 2', 20, N'ห้องประชุมขนาดใหญ่'),
+                    (N'ห้องประชุม C', N'ชั้น 3', 6, N'ห้องประชุมขนาดเล็ก VIP'),
+                    (N'ห้องอบรม', N'ชั้น 1', 50, N'ห้องสัมมนา/อบรม');
+            END;
+
+            IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='RoomBookings' AND xtype='U')
+                CREATE TABLE RoomBookings (
+                    Id        INT IDENTITY PRIMARY KEY,
+                    RoomId    INT NOT NULL,
+                    RoomName  NVARCHAR(100) NOT NULL,
+                    UserId    NVARCHAR(100) NOT NULL,
+                    Title     NVARCHAR(200) NOT NULL,
+                    StartTime DATETIME NOT NULL,
+                    EndTime   DATETIME NOT NULL,
+                    Status    NVARCHAR(20) NOT NULL DEFAULT 'confirmed',
+                    CreatedAt DATETIME NOT NULL DEFAULT GETDATE()
+                );
+            IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name='IX_RoomBookings_Room')
+                CREATE INDEX IX_RoomBookings_Room ON RoomBookings(RoomId, StartTime, EndTime);
+            IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name='IX_RoomBookings_User')
+                CREATE INDEX IX_RoomBookings_User ON RoomBookings(UserId, StartTime);
             """);
     }
 }

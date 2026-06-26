@@ -25,6 +25,10 @@
   .status-dot.offline{background:var(--red)}
   .btn-icon{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:6px 10px;border-radius:8px;cursor:pointer;font-size:.85rem;transition:.15s}
   .btn-icon:hover{border-color:var(--primary);color:var(--text)}
+  .mode-tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:3px}
+  .mode-tab{padding:5px 12px;border-radius:7px;font-size:.8rem;cursor:pointer;color:var(--muted);border:none;background:none;transition:.15s;white-space:nowrap}
+  .mode-tab.active{background:var(--primary);color:#fff}
+  .mode-tab:hover:not(.active){color:var(--text)}
 
   /* Messages */
   #messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth}
@@ -85,6 +89,10 @@
     PasTech AI
   </div>
   <div class="header-controls">
+    <div class="mode-tabs">
+      <button class="mode-tab active" id="tabChat" onclick="setMode('chat')">💬 Chat</button>
+      <button class="mode-tab" id="tabRoom" onclick="setMode('room')">🏢 จองห้อง</button>
+    </div>
     <div class="status-dot" id="statusDot"></div>
     <select id="modelSelect">
       <option value="qwen2.5:7b">qwen2.5:7b</option>
@@ -98,10 +106,10 @@
 
 <div id="messages">
   <div class="welcome" id="welcome">
-    <div style="font-size:3rem">🤖</div>
-    <h2>PasTech AI</h2>
-    <p>Local AI Assistant — powered by Ollama + Qdrant + SQL Server</p>
-    <div class="suggestions">
+    <div style="font-size:3rem" id="welcomeIcon">🤖</div>
+    <h2 id="welcomeTitle">PasTech AI</h2>
+    <p id="welcomeDesc">Local AI Assistant — powered by Ollama + Qdrant + SQL Server</p>
+    <div class="suggestions" id="suggestions">
       <div class="sug" onclick="sendSuggestion(this)">PasTech คืออะไร?</div>
       <div class="sug" onclick="sendSuggestion(this)">สรุปข้อมูลบริษัท</div>
       <div class="sug" onclick="sendSuggestion(this)">บริการของเรามีอะไรบ้าง?</div>
@@ -124,6 +132,7 @@ const API = '';
 let sessionId = localStorage.getItem('pai_session') || newId();
 let userId    = localStorage.getItem('pai_user')    || 'user_' + newId().slice(0,8);
 let streaming  = false;
+let mode       = 'chat'; // 'chat' | 'room'
 
 localStorage.setItem('pai_session', sessionId);
 localStorage.setItem('pai_user', userId);
@@ -133,6 +142,35 @@ document.getElementById('userIdDisplay').textContent = 'User: ' + userId;
 checkHealth();
 
 function newId() { return crypto.randomUUID(); }
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('tabChat').classList.toggle('active', m === 'chat');
+  document.getElementById('tabRoom').classList.toggle('active', m === 'room');
+  if (m === 'room') {
+    document.getElementById('welcomeIcon').textContent = '🏢';
+    document.getElementById('welcomeTitle').textContent = 'ระบบจองห้องประชุม';
+    document.getElementById('welcomeDesc').textContent = 'จองห้องประชุม เช็คความว่าง และดูรายการจองผ่าน AI';
+    document.getElementById('suggestions').innerHTML = `
+      <div class="sug" onclick="sendSuggestion(this)">มีห้องอะไรบ้าง?</div>
+      <div class="sug" onclick="sendSuggestion(this)">จองห้องประชุม A พรุ่งนี้ 10 โมง ถึง 12 โมง</div>
+      <div class="sug" onclick="sendSuggestion(this)">ดูรายการจองของฉัน</div>
+      <div class="sug" onclick="sendSuggestion(this)">ห้อง A ว่างวันนี้บ่ายสองไหม?</div>`;
+    document.getElementById('input').placeholder = 'จองห้อง เช็คว่าง หรือดูรายการจอง...';
+    document.getElementById('modelSelect').value = 'qwen2.5:7b';
+  } else {
+    document.getElementById('welcomeIcon').textContent = '🤖';
+    document.getElementById('welcomeTitle').textContent = 'PasTech AI';
+    document.getElementById('welcomeDesc').textContent = 'Local AI Assistant — powered by Ollama + Qdrant + SQL Server';
+    document.getElementById('suggestions').innerHTML = `
+      <div class="sug" onclick="sendSuggestion(this)">PasTech คืออะไร?</div>
+      <div class="sug" onclick="sendSuggestion(this)">สรุปข้อมูลบริษัท</div>
+      <div class="sug" onclick="sendSuggestion(this)">บริการของเรามีอะไรบ้าง?</div>
+      <div class="sug" onclick="sendSuggestion(this)">ช่วยเขียนโค้ด Python</div>`;
+    document.getElementById('input').placeholder = 'พิมพ์ข้อความ...';
+  }
+  clearMessages();
+}
 
 async function checkHealth() {
   const dot = document.getElementById('statusDot');
@@ -151,24 +189,20 @@ function newSession() {
 
 function clearMessages() {
   const msgs = document.getElementById('messages');
+  const welcome = document.getElementById('welcome');
   msgs.innerHTML = '';
-  msgs.appendChild(document.getElementById('welcome') || createWelcome());
-  showWelcome();
+  msgs.appendChild(welcome);
+  welcome.style.display = '';
 }
 
 function showWelcome() {
-  let w = document.getElementById('welcome');
-  if (!w) {
-    w = document.createElement('div');
-    w.id = 'welcome'; w.className = 'welcome';
-    w.innerHTML = `<div style="font-size:3rem">🤖</div><h2>PasTech AI</h2><p>Local AI Assistant</p>`;
-  }
-  document.getElementById('messages').appendChild(w);
+  const w = document.getElementById('welcome');
+  if (w) w.style.display = '';
 }
 
 function hideWelcome() {
   const w = document.getElementById('welcome');
-  if (w) w.remove();
+  if (w) w.style.display = 'none';
 }
 
 function sendSuggestion(el) {
@@ -245,7 +279,8 @@ async function sendMessage() {
   const model = document.getElementById('modelSelect').value;
 
   try {
-    const resp = await fetch(API + '/api/chat', {
+    const endpoint = mode === 'room' ? '/api/room/chat' : '/api/chat';
+    const resp = await fetch(API + endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ sessionId, userId, message: msg, model })
