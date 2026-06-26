@@ -101,7 +101,7 @@
   <div class="header-controls">
     <div class="mode-tabs">
       <button class="mode-tab active" id="tabPasai"   onclick="setMode('pasai')">
-        🏢 PAS AI <span class="model-badge" id="badgePasai">qwen2.5:7b</span>
+        🏢 PAS AI <span class="model-badge" id="badgePasai">gemma3:4b</span>
       </button>
       <button class="mode-tab" id="tabGeneral" onclick="setMode('general')">
         💬 ทั่วไป <span class="model-badge" id="badgeGeneral">gemma3:4b</span>
@@ -164,16 +164,17 @@ const API = '';
 // ── Mode config ────────────────────────────────────────────────────────────
 const MODES = {
   pasai: {
-    model:       'qwen2.5:7b',
+    model:       'gemma3:4b',
     lockModel:   true,
     endpoint:    '/api/chat',
+    systemPrompt:'คุณคือ PAS AI ผู้ช่วย AI ของบริษัท PasTech คุณตอบได้เฉพาะเรื่องที่เกี่ยวกับบริษัท PasTech เท่านั้น เช่น บริการ ผลิตภัณฑ์ นโยบาย ข้อมูลองค์กร และงานภายใน ถ้าคำถามไม่เกี่ยวกับบริษัท ให้แจ้งสุภาพว่าไม่อยู่ในขอบเขต และแนะนำให้ไปใช้ tab 💬 ทั่วไป แทน ตอบเป็นภาษาไทยเสมอ',
     avatar:      '🏢',
     icon:        '🏢',
     title:       'PAS AI',
-    desc:        'AI ของบริษัท PasTech — ข้อมูลองค์กร ความรู้ภายใน และระบบต่างๆ',
+    desc:        'AI ของบริษัท PasTech — ตอบเฉพาะข้อมูลองค์กร บริการ และงานภายใน',
     placeholder: 'ถามเกี่ยวกับ PasTech...',
     label:       '🏢 PAS AI',
-    suggestions: ['PasTech คืออะไร?','สรุปข้อมูลบริษัท','บริการของเรามีอะไรบ้าง?','ช่วยร่างอีเมลธุรกิจ'],
+    suggestions: ['PasTech คืออะไร?','บริการของเรามีอะไรบ้าง?','ช่วยร่างอีเมลธุรกิจ','นโยบายของบริษัท'],
   },
   general: {
     model:       'gemma3:4b',
@@ -416,7 +417,7 @@ async function sendMessage() {
   try {
     const resp = await fetch(API + endpoint, {
       method: 'POST', headers,
-      body: JSON.stringify({ sessionId, userId, message: msg, model })
+      body: JSON.stringify({ sessionId, userId, message: msg, model, systemPrompt: cfg.systemPrompt || '' })
     });
 
     if (!resp.ok) {
