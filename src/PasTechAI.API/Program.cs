@@ -28,6 +28,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 
 app.UseCors();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 app.MapControllers();
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 app.Run();
