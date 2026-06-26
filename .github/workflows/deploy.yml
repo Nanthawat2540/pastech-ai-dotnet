@@ -1,0 +1,24 @@
+name: Deploy to Home Server
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Pull latest code
+        run: |
+          cd ~/pastech-ai-dotnet
+          git pull origin master
+
+      - name: Build and restart container
+        run: |
+          cd ~/pastech-ai-dotnet
+          docker compose up -d --build
+
+      - name: Health check
+        run: |
+          sleep 15
+          curl -f http://localhost:8080/health || (docker compose -f ~/pastech-ai-dotnet/docker-compose.yml logs --tail=50 && exit 1)
