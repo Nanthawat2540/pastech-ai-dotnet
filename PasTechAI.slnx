@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PasTechAI.API/PasTechAI.API.csproj" />
+    <Project Path="src/PasTechAI.Application/PasTechAI.Application.csproj" />
+    <Project Path="src/PasTechAI.Domain/PasTechAI.Domain.csproj" />
+    <Project Path="src/PasTechAI.Infrastructure/PasTechAI.Infrastructure.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,19 @@
+services:
+  pastech-ai-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pastech-ai-api
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__SqlServer=Server=sqlexpress,1433;Database=PasTechAI;User Id=sa;Password=@Ps03032022;TrustServerCertificate=true;Encrypt=false;
+      - Ollama__BaseUrl=http://ollama:11434
+      - Qdrant__Host=qdrant
+      - Qdrant__Port=6334
+    networks:
+      - proxy-net
+
+networks:
+  proxy-net:
+    external: true

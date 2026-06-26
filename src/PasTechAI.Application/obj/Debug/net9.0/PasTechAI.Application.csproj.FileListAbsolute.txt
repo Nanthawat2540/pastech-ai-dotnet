@@ -1,0 +1,15 @@
+D:\WEB SOM\PasTechAI\src\PasTechAI.Application\obj\Debug\net9.0\PasTechAI.Application.csproj.AssemblyReference.cache
+D:\WEB SOM\PasTechAI\src\PasTechAI.Application\obj\Debug\net9.0\PasTechAI.Application.GeneratedMSBuildEditorConfig.editorconfig
+D:\WEB SOM\PasTechAI\src\PasTechAI.Application\obj\Debug\net9.0\PasTechAI.Application.AssemblyInfoInputs.cache
+D:\WEB SOM\PasTechAI\src\PasTechAI.Application\obj\Debug\net9.0\PasTechAI.Application.AssemblyInfo.cs
+D:\WEB SOM\PasTechAI\src\PasTechAI.Application\obj\Debug\net9.0\PasTechAI.Application.csproj.CoreCompileInputs.cache
+D:\WEB SOM\PasTechAI\src\PasTechAI.Application\bin\Debug\net9.0\PasTechAI.Application.deps.json
+D:\WEB SOM\PasTechAI\src\PasTechAI.Application\bin\Debug\net9.0\PasTechAI.Application.dll
+D:\WEB SOM\PasTechAI\src\PasTechAI.Application\bin\Debug\net9.0\PasTechAI.Application.pdb
+D:\WEB SOM\PasTechAI\src\PasTechAI.Application\bin\Debug\net9.0\PasTechAI.Domain.dll
+D:\WEB SOM\PasTechAI\src\PasTechAI.Application\bin\Debug\net9.0\PasTechAI.Domain.pdb
+D:\WEB SOM\PasTechAI\src\PasTechAI.Application\obj\Debug\net9.0\PasTechA.F8C9CB3E.Up2Date
+D:\WEB SOM\PasTechAI\src\PasTechAI.Application\obj\Debug\net9.0\PasTechAI.Application.dll
+D:\WEB SOM\PasTechAI\src\PasTechAI.Application\obj\Debug\net9.0\refint\PasTechAI.Application.dll
+D:\WEB SOM\PasTechAI\src\PasTechAI.Application\obj\Debug\net9.0\PasTechAI.Application.pdb
+D:\WEB SOM\PasTechAI\src\PasTechAI.Application\obj\Debug\net9.0\ref\PasTechAI.Application.dll

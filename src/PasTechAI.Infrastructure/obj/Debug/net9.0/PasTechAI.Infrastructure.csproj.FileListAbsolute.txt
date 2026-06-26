@@ -1,0 +1,15 @@
+D:\WEB SOM\PasTechAI\src\PasTechAI.Infrastructure\obj\Debug\net9.0\PasTechAI.Infrastructure.csproj.AssemblyReference.cache
+D:\WEB SOM\PasTechAI\src\PasTechAI.Infrastructure\obj\Debug\net9.0\PasTechAI.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+D:\WEB SOM\PasTechAI\src\PasTechAI.Infrastructure\obj\Debug\net9.0\PasTechAI.Infrastructure.AssemblyInfoInputs.cache
+D:\WEB SOM\PasTechAI\src\PasTechAI.Infrastructure\obj\Debug\net9.0\PasTechAI.Infrastructure.AssemblyInfo.cs
+D:\WEB SOM\PasTechAI\src\PasTechAI.Infrastructure\obj\Debug\net9.0\PasTechAI.Infrastructure.csproj.CoreCompileInputs.cache
+D:\WEB SOM\PasTechAI\src\PasTechAI.Infrastructure\bin\Debug\net9.0\PasTechAI.Infrastructure.deps.json
+D:\WEB SOM\PasTechAI\src\PasTechAI.Infrastructure\bin\Debug\net9.0\PasTechAI.Infrastructure.dll
+D:\WEB SOM\PasTechAI\src\PasTechAI.Infrastructure\bin\Debug\net9.0\PasTechAI.Infrastructure.pdb
+D:\WEB SOM\PasTechAI\src\PasTechAI.Infrastructure\bin\Debug\net9.0\PasTechAI.Domain.dll
+D:\WEB SOM\PasTechAI\src\PasTechAI.Infrastructure\bin\Debug\net9.0\PasTechAI.Domain.pdb
+D:\WEB SOM\PasTechAI\src\PasTechAI.Infrastructure\obj\Debug\net9.0\PasTechA.73A5A897.Up2Date
+D:\WEB SOM\PasTechAI\src\PasTechAI.Infrastructure\obj\Debug\net9.0\PasTechAI.Infrastructure.dll
+D:\WEB SOM\PasTechAI\src\PasTechAI.Infrastructure\obj\Debug\net9.0\refint\PasTechAI.Infrastructure.dll
+D:\WEB SOM\PasTechAI\src\PasTechAI.Infrastructure\obj\Debug\net9.0\PasTechAI.Infrastructure.pdb
+D:\WEB SOM\PasTechAI\src\PasTechAI.Infrastructure\obj\Debug\net9.0\ref\PasTechAI.Infrastructure.dll
