@@ -117,8 +117,11 @@
   <div id="erpLoginBanner">
     <div style="font-size:2.5rem">🔐</div>
     <h3>ระบบ ERP — ต้องเข้าสู่ระบบ</h3>
-    <p>ข้อมูล ERP เป็นข้อมูลสำคัญของบริษัท<br>ต้องยืนยันตัวตนด้วย PasTech Account ก่อน</p>
-    <button class="login-btn" onclick="erpLogin()">🔑 เข้าสู่ระบบ CentralAuth</button>
+    <p>ใช้ ERP Account ของคุณ (admin/erp/manager)</p>
+    <input id="erpEmail" type="email" placeholder="Email" style="width:260px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:.9rem;outline:none" autocomplete="email">
+    <input id="erpPassword" type="password" placeholder="Password" style="width:260px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:.9rem;outline:none" autocomplete="current-password" onkeydown="if(event.key==='Enter')erpLogin()">
+    <div id="erpLoginError" style="color:var(--red);font-size:.82rem;min-height:18px"></div>
+    <button class="login-btn" id="erpLoginBtn" onclick="erpLogin()">🔑 เข้าสู่ระบบ</button>
   </div>
   <div class="welcome" id="welcome">
     <div style="font-size:3rem" id="welcomeIcon">🤖</div>
@@ -152,7 +155,6 @@ let userId    = localStorage.getItem('pai_user')    || 'user_' + newId().slice(0
 let streaming  = false;
 let mode       = 'chat'; // 'chat' | 'room' | 'erp'
 let erpToken   = localStorage.getItem('pai_erp_token') || null;
-let erpConfig  = null;
 
 localStorage.setItem('pai_session', sessionId);
 localStorage.setItem('pai_user', userId);
@@ -160,36 +162,42 @@ document.getElementById('sessionId').textContent = sessionId.slice(0,8) + '...';
 document.getElementById('userIdDisplay').textContent = 'User: ' + userId;
 
 checkHealth();
-handleErpCallback();
 
 function newId() { return crypto.randomUUID(); }
 
-// Handle redirect back from CentralAuth (?token=...)
-function handleErpCallback() {
-  const params = new URLSearchParams(window.location.search);
-  const token  = params.get('token');
-  if (!token) return;
-  erpToken = token;
-  localStorage.setItem('pai_erp_token', token);
-  window.history.replaceState({}, '', window.location.pathname);
-  refreshErpTag();
-  setMode('erp');
-}
-
-async function loadErpConfig() {
-  if (erpConfig) return erpConfig;
-  try {
-    const r = await fetch(API + '/api/erp/config');
-    erpConfig = await r.json();
-  } catch { erpConfig = { loginUrl: '', appId: 'pastech-ai' }; }
-  return erpConfig;
-}
-
 async function erpLogin() {
-  const cfg      = await loadErpConfig();
-  const redirect = window.location.origin + window.location.pathname;
-  const url = `${cfg.loginUrl}?app_id=${cfg.appId}&redirect_uri=${encodeURIComponent(redirect)}`;
-  window.location.href = url;
+  const email    = document.getElementById('erpEmail')?.value?.trim();
+  const password = document.getElementById('erpPassword')?.value;
+  const errEl    = document.getElementById('erpLoginError');
+  const btn      = document.getElementById('erpLoginBtn');
+
+  if (!email || !password) {
+    if (errEl) errEl.textContent = 'กรุณากรอก Email และ Password';
+    return;
+  }
+  if (errEl) errEl.textContent = '';
+  if (btn) { btn.disabled = true; btn.textContent = 'กำลังเข้าสู่ระบบ...'; }
+
+  try {
+    const r = await fetch(API + '/api/erp/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      if (errEl) errEl.textContent = data.error || 'Login ไม่สำเร็จ';
+      return;
+    }
+    erpToken = data.token;
+    localStorage.setItem('pai_erp_token', erpToken);
+    refreshErpTag();
+    setMode('erp');
+  } catch (e) {
+    if (errEl) errEl.textContent = 'ไม่สามารถเชื่อมต่อ ERP ได้';
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '🔑 เข้าสู่ระบบ'; }
+  }
 }
 
 function erpLogout() {

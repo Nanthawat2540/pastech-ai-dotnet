@@ -1,3 +1,5 @@
+using System.Net.Http.Json;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using PasTechAI.Application.Models;
 using PasTechAI.Application.Services;
@@ -10,18 +12,64 @@ namespace PasTechAI.API.Controllers;
 public class ErpController(
     ChatOrchestrator orchestrator,
     ICentralAuthService authSvc,
-    IConfiguration config) : ControllerBase
+    IConfiguration config,
+    IHttpClientFactory httpFactory) : ControllerBase
 {
-    /// <summary>GET /api/erp/config — returns CentralAuth login URL for ERP mode</summary>
-    [HttpGet("config")]
-    public IActionResult GetConfig()
+    private static readonly JsonSerializerOptions JsonOpts = new(JsonSerializerDefaults.Web);
+
+    /// <summary>POST /api/erp/login — proxy login to erp-auth, returns JWT</summary>
+    [HttpPost("login")]
+    public async Task<IActionResult> LoginAsync([FromBody] ErpLoginRequest req)
     {
-        var loginUrl  = config["CentralAuth:LoginUrl"] ?? "";
-        var appId     = config["CentralAuth:AppId"]   ?? "pastech-ai";
-        return Ok(new { loginUrl, appId });
+        if (string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.Password))
+            return BadRequest(new { error = "กรุณากรอก Email และ Password" });
+
+        var erpUrl = config["CentralAuth:ErpAuthUrl"] ?? "http://erp-auth:3001";
+        var http   = httpFactory.CreateClient("erp-auth");
+        http.BaseAddress = new Uri(erpUrl);
+
+        try
+        {
+            var res = await http.PostAsJsonAsync("/api/v1/auth/login",
+                new { email = req.Email, password = req.Password });
+
+            var body = await res.Content.ReadFromJsonAsync<JsonElement>(JsonOpts);
+
+            if (!res.IsSuccessStatusCode)
+            {
+                var msg = body.TryGetProperty("message", out var m) ? m.GetString() : "Invalid credentials";
+                return Unauthorized(new { error = msg });
+            }
+
+            // Extract token from { success: true, data: { tokens: { accessToken } }, user: {...} }
+            var token = body
+                .GetProperty("data")
+                .GetProperty("tokens")
+                .GetProperty("accessToken")
+                .GetString();
+
+            var user = body.GetProperty("data").GetProperty("user");
+
+            return Ok(new
+            {
+                token,
+                user = new
+                {
+                    email       = user.TryGetProperty("email",        out var e) ? e.GetString() : req.Email,
+                    displayName = user.TryGetProperty("display_name", out var d) ? d.GetString()
+                                : user.TryGetProperty("first_name",   out var f) ? f.GetString()
+                                : req.Email,
+                    roles = user.TryGetProperty("role_codes", out var r) ? r : default
+                }
+            });
+        }
+        catch (HttpRequestException)
+        {
+            return StatusCode(503, new { error = "ไม่สามารถเชื่อมต่อ ERP Auth Service ได้" });
+        }
     }
 
-    /// <summary>POST /api/erp/chat — ERP chat, requires CentralAuth JWT (Bearer token)</summary>
+    /// <summary>POST /api/erp/chat — ERP chat, requires erp-auth JWT (Bearer token)</summary>
     [HttpPost("chat")]
     public async Task ChatAsync([FromBody] ChatRequest req, CancellationToken ct)
     {
@@ -53,20 +101,20 @@ public class ErpController(
             return;
         }
 
-        // Build ERP-aware system prompt
+        var roleList = string.Join(", ", user.Roles);
         var erpPrompt = $"""
             คุณคือ AI Assistant ระบบ ERP ของ PasTech ตอบภาษาไทยกระชับ ตรงประเด็น
-            ผู้ใช้งาน: {user.DisplayName} (username: {user.Username}, role: {user.Role})
-            ข้อมูลที่เข้าถึงได้: ข้อมูลตามสิทธิ์ของ role "{user.Role}"
+            ผู้ใช้งาน: {user.DisplayName} (email: {user.Email})
+            สิทธิ์: {roleList}
             กฎ:
-            - ระวังข้อมูลที่เป็นความลับ ไม่แสดงข้อมูลเกินสิทธิ์
-            - ถ้าไม่มีข้อมูลในระบบ ให้แจ้งว่าต้องตรวจสอบผ่านระบบ ERP โดยตรง
-            - บันทึกการเข้าถึงข้อมูลสำคัญ (audit trail)
+            - แสดงข้อมูลตามสิทธิ์ของ role เท่านั้น
+            - ถ้าไม่แน่ใจเรื่องข้อมูล ให้แจ้งว่าต้องตรวจสอบผ่านระบบ ERP โดยตรง
+            - ห้ามเปิดเผยข้อมูลที่เป็นความลับหรือข้อมูลส่วนบุคคลที่ไม่จำเป็น
             """;
 
         var erpReq = req with
         {
-            UserId       = user.Username,
+            UserId       = user.Email,
             SystemPrompt = erpPrompt
         };
 
@@ -76,10 +124,12 @@ public class ErpController(
 
         await foreach (var chunk in orchestrator.ChatAsync(erpReq, ct))
         {
-            await Response.WriteAsync($"data: {System.Text.Json.JsonSerializer.Serialize(chunk)}\n\n", ct);
+            await Response.WriteAsync($"data: {JsonSerializer.Serialize(chunk)}\n\n", ct);
             await Response.Body.FlushAsync(ct);
         }
 
         await Response.WriteAsync("data: [DONE]\n\n", ct);
     }
 }
+
+public record ErpLoginRequest(string Email, string Password);
