@@ -8,7 +8,7 @@ public class QueryRewriteService(IOllamaClient ollama)
 {
     private static readonly Regex ArrayPattern = new(@"\[[\s\S]*?\]", RegexOptions.Compiled);
 
-    public async Task<List<string>> RewriteAsync(string query, string userId)
+    public async Task<List<string>> RewriteAsync(string query, string userId, string model = "qwen2.5:7b")
     {
         if (query.Length < 3) return [query];
 
@@ -22,7 +22,7 @@ public class QueryRewriteService(IOllamaClient ollama)
 
         try
         {
-            var result = await ollama.GenerateAsync("qwen2.5:7b", prompt,
+            var result = await ollama.GenerateAsync(model, prompt,
                 new OllamaOptions { Temperature = 0.1f, NumPredict = 150 });
 
             var match = ArrayPattern.Match(result);

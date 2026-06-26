@@ -31,7 +31,7 @@ public class ChatOrchestrator(
         [EnumeratorCancellation] CancellationToken ct = default)
     {
         // ── Step 1: Query Rewrite ──────────────────────────────────
-        var queries = await queryRewrite.RewriteAsync(req.Message, req.UserId);
+        var queries = await queryRewrite.RewriteAsync(req.Message, req.UserId, req.Model);
 
         // ── Step 2: User Memory ───────────────────────────────────
         var memories = await memoryRepo.GetByUserAsync(req.UserId);
@@ -137,10 +137,10 @@ public class ChatOrchestrator(
                                      .ToList();
 
             if (msgCount % 10 == 0)
-                await memoryService.ExtractAndSaveAsync(req.UserId, allMsgs);
+                await memoryService.ExtractAndSaveAsync(req.UserId, allMsgs, req.Model);
 
             if (msgCount % 50 == 0)
-                await summaryService.GenerateAndSaveAsync(req.SessionId, req.UserId);
+                await summaryService.GenerateAndSaveAsync(req.SessionId, req.UserId, req.Model);
         }
         catch (Exception ex)
         {

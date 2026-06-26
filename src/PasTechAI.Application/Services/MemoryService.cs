@@ -15,7 +15,7 @@ public class MemoryService(IMemoryRepository repo, IOllamaClient ollama)
     public Task UpsertAsync(string userId, string type, string value) =>
         repo.UpsertAsync(userId, type, value);
 
-    public async Task ExtractAndSaveAsync(string userId, List<ChatMessage> messages)
+    public async Task ExtractAndSaveAsync(string userId, List<ChatMessage> messages, string model = "qwen2.5:7b")
     {
         if (messages.Count == 0) return;
 
@@ -34,7 +34,7 @@ public class MemoryService(IMemoryRepository repo, IOllamaClient ollama)
 
         try
         {
-            var result = await ollama.GenerateAsync("qwen2.5:7b", prompt,
+            var result = await ollama.GenerateAsync(model, prompt,
                 new OllamaOptions { Temperature = 0.1f, NumPredict = 150 });
 
             var match = JsonPattern.Match(result);

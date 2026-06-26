@@ -8,7 +8,7 @@ public class SummaryService(ISummaryRepository repo, IChatRepository chatRepo, I
     public Task<List<ConversationSummary>> GetRecentAsync(string userId, int limit = 2) =>
         repo.GetRecentByUserAsync(userId, limit);
 
-    public async Task GenerateAndSaveAsync(string sessionId, string userId)
+    public async Task GenerateAndSaveAsync(string sessionId, string userId, string model = "qwen2.5:7b")
     {
         var messages = await chatRepo.GetBySessionAsync(sessionId);
         if (messages.Count < 10) return;
@@ -29,7 +29,7 @@ public class SummaryService(ISummaryRepository repo, IChatRepository chatRepo, I
 
         try
         {
-            var summary = await ollama.GenerateAsync("qwen2.5:7b", prompt,
+            var summary = await ollama.GenerateAsync(model, prompt,
                 new OllamaOptions { Temperature = 0.2f, NumPredict = 400 });
 
             if (!string.IsNullOrWhiteSpace(summary))
