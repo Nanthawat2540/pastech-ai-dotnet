@@ -4,6 +4,7 @@ using PasTechAI.Domain.Interfaces;
 using PasTechAI.Infrastructure.Clients;
 using PasTechAI.Infrastructure.Data;
 using PasTechAI.Infrastructure.Repositories;
+using PasTechAI.Infrastructure.Services;
 using Qdrant.Client;
 
 namespace PasTechAI.Infrastructure;
@@ -40,6 +41,9 @@ public static class InfrastructureExtensions
 
         // DB initializer
         services.AddSingleton(_ => new DbInitializer(connStr));
+
+        // CentralAuth JWT validator
+        services.AddSingleton<ICentralAuthService, CentralAuthService>();
 
         return services;
     }
