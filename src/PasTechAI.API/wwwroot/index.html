@@ -3,32 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PasTech AI</title>
+<title>PAS AI</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   :root{
     --bg:#0f1117;--side:#16181f;--card:#1e2028;--border:#2a2d38;
     --primary:#6c63ff;--primary-hover:#7c74ff;--text:#e8eaf0;--muted:#8b8fa8;
     --user-bg:#6c63ff;--ai-bg:#1e2028;--code-bg:#12141a;
-    --green:#4caf7d;--red:#f06292;
+    --green:#4caf7d;--red:#f06292;--orange:#ff9f43;
   }
   body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);height:100dvh;display:flex;flex-direction:column;overflow:hidden}
 
   /* Header */
-  header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--side);border-bottom:1px solid var(--border);flex-shrink:0;gap:12px}
-  .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.1rem}
-  .logo-icon{width:32px;height:32px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem}
+  header{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:var(--side);border-bottom:1px solid var(--border);flex-shrink:0;gap:12px}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:1rem;white-space:nowrap}
+  .logo-icon{width:30px;height:30px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.9rem}
   .header-controls{display:flex;align-items:center;gap:8px}
-  select{background:var(--card);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:8px;font-size:.85rem;cursor:pointer;outline:none}
+  select{background:var(--card);border:1px solid var(--border);color:var(--text);padding:5px 8px;border-radius:8px;font-size:.82rem;cursor:pointer;outline:none}
   select:focus{border-color:var(--primary)}
   .status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
   .status-dot.offline{background:var(--red)}
-  .btn-icon{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:6px 10px;border-radius:8px;cursor:pointer;font-size:.85rem;transition:.15s}
+  .btn-icon{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:5px 10px;border-radius:8px;cursor:pointer;font-size:.82rem;transition:.15s}
   .btn-icon:hover{border-color:var(--primary);color:var(--text)}
-  .mode-tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:3px}
-  .mode-tab{padding:5px 12px;border-radius:7px;font-size:.8rem;cursor:pointer;color:var(--muted);border:none;background:none;transition:.15s;white-space:nowrap}
+
+  /* Mode tabs */
+  .mode-tabs{display:flex;gap:3px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:3px}
+  .mode-tab{padding:5px 14px;border-radius:7px;font-size:.82rem;cursor:pointer;color:var(--muted);border:none;background:none;transition:.15s;white-space:nowrap;display:flex;align-items:center;gap:5px}
   .mode-tab.active{background:var(--primary);color:#fff}
   .mode-tab:hover:not(.active){color:var(--text)}
+  .mode-tab .model-badge{font-size:.68rem;opacity:.7;font-family:monospace}
 
   /* Messages */
   #messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth}
@@ -43,12 +46,11 @@
 
   .avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;margin-top:2px}
   .msg.user .avatar{background:var(--user-bg)}
-  .msg.ai .avatar{background:var(--card);border:1px solid var(--border)}
+  .msg.ai  .avatar{background:var(--card);border:1px solid var(--border)}
 
   .bubble{max-width:680px;padding:12px 16px;border-radius:16px;line-height:1.65;font-size:.92rem;white-space:pre-wrap;word-break:break-word}
   .msg.user .bubble{background:var(--user-bg);border-bottom-right-radius:4px}
-  .msg.ai .bubble{background:var(--ai-bg);border:1px solid var(--border);border-bottom-left-radius:4px}
-
+  .msg.ai  .bubble{background:var(--ai-bg);border:1px solid var(--border);border-bottom-left-radius:4px}
   .bubble code{background:var(--code-bg);padding:1px 5px;border-radius:4px;font-family:monospace;font-size:.88em}
   .bubble pre{background:var(--code-bg);padding:12px;border-radius:8px;overflow-x:auto;margin:8px 0}
   .bubble pre code{background:none;padding:0}
@@ -60,23 +62,23 @@
   @keyframes bounce{0%,60%,100%{transform:none}30%{transform:translateY(-6px)}}
 
   /* Welcome */
-  .welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:16px;padding:40px;text-align:center;color:var(--muted)}
-  .welcome h2{color:var(--text);font-size:1.5rem}
-  .welcome p{font-size:.9rem;max-width:400px}
-  .suggestions{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px}
-  .sug{background:var(--card);border:1px solid var(--border);padding:8px 14px;border-radius:20px;font-size:.85rem;cursor:pointer;transition:.15s;color:var(--text)}
+  .welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:14px;padding:40px;text-align:center;color:var(--muted)}
+  .welcome h2{color:var(--text);font-size:1.4rem}
+  .welcome p{font-size:.88rem;max-width:400px;line-height:1.6}
+  .suggestions{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:4px}
+  .sug{background:var(--card);border:1px solid var(--border);padding:7px 14px;border-radius:20px;font-size:.83rem;cursor:pointer;transition:.15s;color:var(--text)}
   .sug:hover{border-color:var(--primary);color:var(--primary)}
 
   /* ERP login banner */
   #erpLoginBanner{display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;text-align:center;gap:12px;flex-direction:column;align-items:center;max-width:400px;margin:auto}
-  #erpLoginBanner h3{font-size:1.1rem;color:var(--text)}
-  #erpLoginBanner p{font-size:.85rem;color:var(--muted)}
-  .login-btn{background:var(--primary);color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:.9rem;cursor:pointer;transition:.15s}
+  #erpLoginBanner h3{font-size:1.05rem;color:var(--text)}
+  #erpLoginBanner p{font-size:.83rem;color:var(--muted)}
+  .login-btn{background:var(--primary);color:#fff;border:none;padding:9px 22px;border-radius:8px;font-size:.88rem;cursor:pointer;transition:.15s}
   .login-btn:hover{background:var(--primary-hover)}
-  .erp-user-tag{background:var(--card);border:1px solid var(--green);color:var(--green);padding:4px 10px;border-radius:20px;font-size:.8rem}
+  .erp-user-tag{background:var(--card);border:1px solid var(--green);color:var(--green);padding:3px 9px;border-radius:20px;font-size:.78rem}
 
   /* Input */
-  footer{padding:16px 20px;background:var(--side);border-top:1px solid var(--border);flex-shrink:0}
+  footer{padding:14px 20px;background:var(--side);border-top:1px solid var(--border);flex-shrink:0}
   .input-wrap{display:flex;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px 12px;transition:.15s;max-width:840px;margin:0 auto}
   .input-wrap:focus-within{border-color:var(--primary)}
   #input{flex:1;background:none;border:none;color:var(--text);font-size:.92rem;resize:none;outline:none;min-height:24px;max-height:140px;overflow-y:auto;line-height:1.5;font-family:inherit}
@@ -86,26 +88,33 @@
   .send-btn{background:var(--primary);border:none;color:#fff;width:36px;height:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;align-self:flex-end;flex-shrink:0;transition:.15s;font-size:1rem}
   .send-btn:hover{background:var(--primary-hover)}
   .send-btn:disabled{background:var(--border);cursor:not-allowed;color:var(--muted)}
-  .footer-hint{text-align:center;color:var(--muted);font-size:.75rem;margin-top:8px;max-width:840px;margin-left:auto;margin-right:auto}
+  .footer-hint{text-align:center;color:var(--muted);font-size:.73rem;margin-top:7px;max-width:840px;margin-left:auto;margin-right:auto}
 </style>
 </head>
 <body>
 
 <header>
   <div class="logo">
-    <div class="logo-icon">🤖</div>
-    PasTech AI
+    <div class="logo-icon">🏢</div>
+    PAS AI
   </div>
   <div class="header-controls">
     <div class="mode-tabs">
-      <button class="mode-tab active" id="tabChat" onclick="setMode('chat')">💬 Chat</button>
-      <button class="mode-tab" id="tabRoom" onclick="setMode('room')">🏢 จองห้อง</button>
-      <button class="mode-tab" id="tabErp" onclick="setMode('erp')">🏭 ERP</button>
+      <button class="mode-tab active" id="tabPasai"   onclick="setMode('pasai')">
+        🏢 PAS AI <span class="model-badge" id="badgePasai">qwen2.5:7b</span>
+      </button>
+      <button class="mode-tab" id="tabGeneral" onclick="setMode('general')">
+        💬 ทั่วไป <span class="model-badge" id="badgeGeneral">gemma3:4b</span>
+      </button>
+      <button class="mode-tab" id="tabAgent"   onclick="setMode('agent')">
+        🤖 Agent <span class="model-badge" id="badgeAgent">qwen2.5:7b</span>
+      </button>
     </div>
     <div class="status-dot" id="statusDot"></div>
-    <select id="modelSelect">
+    <select id="modelSelect" onchange="onModelChange()">
       <option value="qwen2.5:7b">qwen2.5:7b</option>
       <option value="gemma3:4b">gemma3:4b</option>
+      <option value="qwen2.5-coder:7b">qwen2.5-coder:7b</option>
       <option value="llama3.2:3b">llama3.2:3b</option>
     </select>
     <button class="btn-icon" onclick="newSession()" title="New chat">+ New</button>
@@ -115,158 +124,192 @@
 
 <div id="messages">
   <div id="erpLoginBanner">
-    <div style="font-size:2.5rem">🔐</div>
-    <h3>ระบบ ERP — ต้องเข้าสู่ระบบ</h3>
-    <p>ใช้ ERP Account ของคุณ (admin/erp/manager)</p>
-    <input id="erpEmail" type="email" placeholder="Email" style="width:260px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:.9rem;outline:none" autocomplete="email">
-    <input id="erpPassword" type="password" placeholder="Password" style="width:260px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:.9rem;outline:none" autocomplete="current-password" onkeydown="if(event.key==='Enter')erpLogin()">
-    <div id="erpLoginError" style="color:var(--red);font-size:.82rem;min-height:18px"></div>
+    <div style="font-size:2.2rem">🔐</div>
+    <h3>Agent ERP — ต้องเข้าสู่ระบบ</h3>
+    <p>ใช้ ERP Account ของคุณ</p>
+    <input id="erpEmail"    type="email"    placeholder="Email"    style="width:260px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:.88rem;outline:none" autocomplete="email">
+    <input id="erpPassword" type="password" placeholder="Password" style="width:260px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:.88rem;outline:none" autocomplete="current-password" onkeydown="if(event.key==='Enter')erpLogin()">
+    <div id="erpLoginError" style="color:var(--red);font-size:.8rem;min-height:16px"></div>
     <button class="login-btn" id="erpLoginBtn" onclick="erpLogin()">🔑 เข้าสู่ระบบ</button>
   </div>
   <div class="welcome" id="welcome">
-    <div style="font-size:3rem" id="welcomeIcon">🤖</div>
-    <h2 id="welcomeTitle">PasTech AI</h2>
-    <p id="welcomeDesc">Local AI Assistant — powered by Ollama + Qdrant + SQL Server</p>
+    <div style="font-size:2.8rem" id="welcomeIcon">🏢</div>
+    <h2 id="welcomeTitle">PAS AI</h2>
+    <p id="welcomeDesc">AI ของบริษัท PasTech — ข้อมูลองค์กร ความรู้ภายใน และระบบต่างๆ</p>
     <div class="suggestions" id="suggestions">
       <div class="sug" onclick="sendSuggestion(this)">PasTech คืออะไร?</div>
       <div class="sug" onclick="sendSuggestion(this)">สรุปข้อมูลบริษัท</div>
       <div class="sug" onclick="sendSuggestion(this)">บริการของเรามีอะไรบ้าง?</div>
-      <div class="sug" onclick="sendSuggestion(this)">ช่วยเขียนโค้ด Python</div>
+      <div class="sug" onclick="sendSuggestion(this)">ช่วยร่างอีเมลธุรกิจ</div>
     </div>
   </div>
 </div>
 
 <footer>
   <div class="input-wrap">
-    <textarea id="input" placeholder="พิมพ์ข้อความ..." rows="1"></textarea>
+    <textarea id="input" placeholder="ถามเกี่ยวกับ PasTech..." rows="1"></textarea>
     <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
   </div>
   <div class="footer-hint">
-    Session: <span id="sessionId"></span> · <span id="userIdDisplay"></span>
-    <span id="erpUserTag" style="display:none"> · <span class="erp-user-tag" id="erpUserLabel"></span> <a href="#" onclick="erpLogout();return false;" style="color:var(--muted);font-size:.75rem">[ออก]</a></span>
+    <span id="modeLabel">🏢 PAS AI</span> ·
+    Session: <span id="sessionId"></span> ·
+    <span id="userIdDisplay"></span>
+    <span id="erpUserTag" style="display:none"> · <span class="erp-user-tag" id="erpUserLabel"></span> <a href="#" onclick="erpLogout();return false;" style="color:var(--muted);font-size:.72rem">[ออก]</a></span>
   </div>
 </footer>
 
 <script>
 const API = '';
 
+// ── Mode config ────────────────────────────────────────────────────────────
+const MODES = {
+  pasai: {
+    model:       'qwen2.5:7b',
+    lockModel:   true,
+    endpoint:    '/api/chat',
+    avatar:      '🏢',
+    icon:        '🏢',
+    title:       'PAS AI',
+    desc:        'AI ของบริษัท PasTech — ข้อมูลองค์กร ความรู้ภายใน และระบบต่างๆ',
+    placeholder: 'ถามเกี่ยวกับ PasTech...',
+    label:       '🏢 PAS AI',
+    suggestions: ['PasTech คืออะไร?','สรุปข้อมูลบริษัท','บริการของเรามีอะไรบ้าง?','ช่วยร่างอีเมลธุรกิจ'],
+  },
+  general: {
+    model:       'gemma3:4b',
+    lockModel:   false,
+    endpoint:    '/api/chat',
+    avatar:      '💬',
+    icon:        '💬',
+    title:       'ทั่วไป',
+    desc:        'สนทนาทั่วไป ถามตอบ เขียน โค้ด แปลภาษา — เลือก model ได้เอง',
+    placeholder: 'พิมพ์อะไรก็ได้...',
+    label:       '💬 ทั่วไป',
+    suggestions: ['ช่วยเขียนโค้ด Python','แปลภาษาอังกฤษ','อธิบายแนวคิด RAG','ช่วยสรุปเอกสาร'],
+  },
+  agent: {
+    model:       'qwen2.5:7b',
+    lockModel:   true,
+    endpoint:    '/api/room/chat',
+    avatar:      '🤖',
+    icon:        '🤖',
+    title:       'Agent',
+    desc:        'AI อัจฉริยะที่ใช้ tools — จองห้อง เช็คตาราง และระบบ ERP (ต้องล็อกอิน)',
+    placeholder: 'จองห้อง / ถาม ERP...',
+    label:       '🤖 Agent',
+    suggestions: ['มีห้องประชุมอะไรบ้าง?','จองห้อง A พรุ่งนี้ 10-12 โมง','ดูรายการจองของฉัน','ห้อง B ว่างบ่ายสองไหม?'],
+  },
+};
+
 let sessionId = localStorage.getItem('pai_session') || newId();
 let userId    = localStorage.getItem('pai_user')    || 'user_' + newId().slice(0,8);
-let streaming  = false;
-let mode       = 'chat'; // 'chat' | 'room' | 'erp'
-let erpToken   = localStorage.getItem('pai_erp_token') || null;
+let streaming = false;
+let mode      = 'pasai';
+let erpToken  = localStorage.getItem('pai_erp_token') || null;
 
 localStorage.setItem('pai_session', sessionId);
 localStorage.setItem('pai_user', userId);
-document.getElementById('sessionId').textContent = sessionId.slice(0,8) + '...';
+document.getElementById('sessionId').textContent    = sessionId.slice(0,8) + '...';
 document.getElementById('userIdDisplay').textContent = 'User: ' + userId;
 
 checkHealth();
+refreshErpTag();
 
 function newId() { return crypto.randomUUID(); }
 
+// ── Mode switching ─────────────────────────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  const cfg = MODES[m];
+
+  // Update tab active state + badges
+  Object.keys(MODES).forEach(k => {
+    const tab = document.getElementById('tab' + k.charAt(0).toUpperCase() + k.slice(1));
+    if (tab) tab.classList.toggle('active', k === m);
+    const badge = document.getElementById('badge' + k.charAt(0).toUpperCase() + k.slice(1));
+    if (badge) badge.textContent = MODES[k].model;
+  });
+
+  // Auto-switch model
+  const sel = document.getElementById('modelSelect');
+  sel.value    = cfg.model;
+  sel.disabled = cfg.lockModel;
+  sel.style.opacity = cfg.lockModel ? '0.5' : '1';
+
+  // Update welcome content
+  document.getElementById('welcomeIcon').textContent  = cfg.icon;
+  document.getElementById('welcomeTitle').textContent = cfg.title;
+  document.getElementById('welcomeDesc').textContent  = cfg.desc;
+  document.getElementById('input').placeholder        = cfg.placeholder;
+  document.getElementById('modeLabel').textContent    = cfg.label;
+
+  document.getElementById('suggestions').innerHTML =
+    cfg.suggestions.map(s => `<div class="sug" onclick="sendSuggestion(this)">${s}</div>`).join('');
+
+  // ERP login banner (Agent mode only when not logged in)
+  const banner    = document.getElementById('erpLoginBanner');
+  const inputWrap = document.querySelector('.input-wrap');
+  const needsErpLogin = (m === 'agent') && !erpToken;
+  banner.style.display    = needsErpLogin ? 'flex' : 'none';
+  inputWrap.style.display = needsErpLogin ? 'none' : '';
+
+  clearMessages();
+}
+
+function onModelChange() {
+  const cfg = MODES[mode];
+  if (!cfg.lockModel) {
+    const badge = document.getElementById('badgeGeneral');
+    if (badge) badge.textContent = document.getElementById('modelSelect').value;
+  }
+}
+
+// ── ERP Auth ───────────────────────────────────────────────────────────────
 async function erpLogin() {
   const email    = document.getElementById('erpEmail')?.value?.trim();
   const password = document.getElementById('erpPassword')?.value;
   const errEl    = document.getElementById('erpLoginError');
   const btn      = document.getElementById('erpLoginBtn');
 
-  if (!email || !password) {
-    if (errEl) errEl.textContent = 'กรุณากรอก Email และ Password';
-    return;
-  }
+  if (!email || !password) { if (errEl) errEl.textContent = 'กรุณากรอก Email และ Password'; return; }
   if (errEl) errEl.textContent = '';
   if (btn) { btn.disabled = true; btn.textContent = 'กำลังเข้าสู่ระบบ...'; }
 
   try {
-    const r = await fetch(API + '/api/erp/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const r    = await fetch(API + '/api/erp/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
     });
     const data = await r.json();
-    if (!r.ok) {
-      if (errEl) errEl.textContent = data.error || 'Login ไม่สำเร็จ';
-      return;
-    }
+    if (!r.ok) { if (errEl) errEl.textContent = data.error || 'Login ไม่สำเร็จ'; return; }
     erpToken = data.token;
     localStorage.setItem('pai_erp_token', erpToken);
     refreshErpTag();
-    setMode('erp');
-  } catch (e) {
-    if (errEl) errEl.textContent = 'ไม่สามารถเชื่อมต่อ ERP ได้';
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = '🔑 เข้าสู่ระบบ'; }
-  }
+    setMode('agent');
+  } catch { if (errEl) errEl.textContent = 'ไม่สามารถเชื่อมต่อ ERP ได้'; }
+  finally { if (btn) { btn.disabled = false; btn.textContent = '🔑 เข้าสู่ระบบ'; } }
 }
 
 function erpLogout() {
   erpToken = null;
   localStorage.removeItem('pai_erp_token');
   refreshErpTag();
-  setMode('erp');
+  setMode('agent');
 }
 
-function setMode(m) {
-  mode = m;
-  document.getElementById('tabChat').classList.toggle('active', m === 'chat');
-  document.getElementById('tabRoom').classList.toggle('active', m === 'room');
-  document.getElementById('tabErp').classList.toggle('active', m === 'erp');
-
-  const banner   = document.getElementById('erpLoginBanner');
-  const inputWrap = document.querySelector('.input-wrap');
-  const sendBtn  = document.getElementById('sendBtn');
-
-  if (m === 'room') {
-    banner.style.display = 'none';
-    inputWrap.style.display = '';
-    document.getElementById('welcomeIcon').textContent = '🏢';
-    document.getElementById('welcomeTitle').textContent = 'ระบบจองห้องประชุม';
-    document.getElementById('welcomeDesc').textContent = 'จองห้องประชุม เช็คความว่าง และดูรายการจองผ่าน AI';
-    document.getElementById('suggestions').innerHTML = `
-      <div class="sug" onclick="sendSuggestion(this)">มีห้องอะไรบ้าง?</div>
-      <div class="sug" onclick="sendSuggestion(this)">จองห้องประชุม A พรุ่งนี้ 10 โมง ถึง 12 โมง</div>
-      <div class="sug" onclick="sendSuggestion(this)">ดูรายการจองของฉัน</div>
-      <div class="sug" onclick="sendSuggestion(this)">ห้อง A ว่างวันนี้บ่ายสองไหม?</div>`;
-    document.getElementById('input').placeholder = 'จองห้อง เช็คว่าง หรือดูรายการจอง...';
-    document.getElementById('modelSelect').value = 'qwen2.5:7b';
-
-  } else if (m === 'erp') {
-    document.getElementById('welcomeIcon').textContent = '🏭';
-    document.getElementById('welcomeTitle').textContent = 'ระบบ ERP';
-    document.getElementById('welcomeDesc').textContent = 'ถามข้อมูล ERP ได้เลย — ต้องเข้าสู่ระบบก่อน';
-    document.getElementById('suggestions').innerHTML = `
-      <div class="sug" onclick="sendSuggestion(this)">ยอดขายเดือนนี้เท่าไร?</div>
-      <div class="sug" onclick="sendSuggestion(this)">สรุปสินค้าคงคลัง</div>
-      <div class="sug" onclick="sendSuggestion(this)">รายการออเดอร์ที่ค้างอยู่</div>
-      <div class="sug" onclick="sendSuggestion(this)">ข้อมูลลูกค้า VIP</div>`;
-    document.getElementById('input').placeholder = 'ถามข้อมูล ERP...';
-    document.getElementById('modelSelect').value = 'qwen2.5:7b';
-
-    if (!erpToken) {
-      banner.style.display = 'flex';
-      inputWrap.style.display = 'none';
-    } else {
-      banner.style.display = 'none';
-      inputWrap.style.display = '';
-    }
-
-  } else {
-    banner.style.display = 'none';
-    inputWrap.style.display = '';
-    document.getElementById('welcomeIcon').textContent = '🤖';
-    document.getElementById('welcomeTitle').textContent = 'PasTech AI';
-    document.getElementById('welcomeDesc').textContent = 'Local AI Assistant — powered by Ollama + Qdrant + SQL Server';
-    document.getElementById('suggestions').innerHTML = `
-      <div class="sug" onclick="sendSuggestion(this)">PasTech คืออะไร?</div>
-      <div class="sug" onclick="sendSuggestion(this)">สรุปข้อมูลบริษัท</div>
-      <div class="sug" onclick="sendSuggestion(this)">บริการของเรามีอะไรบ้าง?</div>
-      <div class="sug" onclick="sendSuggestion(this)">ช่วยเขียนโค้ด Python</div>`;
-    document.getElementById('input').placeholder = 'พิมพ์ข้อความ...';
-  }
-  clearMessages();
+function refreshErpTag() {
+  const tag   = document.getElementById('erpUserTag');
+  const label = document.getElementById('erpUserLabel');
+  if (erpToken) {
+    try {
+      const p = JSON.parse(atob(erpToken.split('.')[1]));
+      label.textContent  = '🔑 ' + (p.display_name || p.first_name || p.email || 'ERP User');
+      tag.style.display  = '';
+    } catch { tag.style.display = 'none'; }
+  } else { tag.style.display = 'none'; }
 }
 
+// ── Health ─────────────────────────────────────────────────────────────────
 async function checkHealth() {
   const dot = document.getElementById('statusDot');
   try {
@@ -275,6 +318,7 @@ async function checkHealth() {
   } catch { dot.className = 'status-dot offline'; }
 }
 
+// ── Session ────────────────────────────────────────────────────────────────
 function newSession() {
   sessionId = newId();
   localStorage.setItem('pai_session', sessionId);
@@ -283,37 +327,30 @@ function newSession() {
 }
 
 function clearMessages() {
-  const msgs = document.getElementById('messages');
+  const msgs    = document.getElementById('messages');
   const welcome = document.getElementById('welcome');
+  const banner  = document.getElementById('erpLoginBanner');
   msgs.innerHTML = '';
+  msgs.appendChild(banner);
   msgs.appendChild(welcome);
   welcome.style.display = '';
 }
 
-function showWelcome() {
-  const w = document.getElementById('welcome');
-  if (w) w.style.display = '';
-}
-
-function hideWelcome() {
-  const w = document.getElementById('welcome');
-  if (w) w.style.display = 'none';
-}
+function hideWelcome() { document.getElementById('welcome').style.display = 'none'; }
 
 function sendSuggestion(el) {
   document.getElementById('input').value = el.textContent;
   sendMessage();
 }
 
+// ── Messages ───────────────────────────────────────────────────────────────
 function appendMsg(role, text) {
   hideWelcome();
-  const wrap = document.getElementById('messages');
-  const div = document.createElement('div');
+  const wrap   = document.getElementById('messages');
+  const div    = document.createElement('div');
   div.className = `msg ${role}`;
-  const avatar = role === 'user' ? '👤' : '🤖';
-  div.innerHTML = `
-    <div class="avatar">${avatar}</div>
-    <div class="bubble" id="bubble-${Date.now()}">${escHtml(text)}</div>`;
+  const avatar = role === 'user' ? '👤' : (MODES[mode]?.avatar || '🤖');
+  div.innerHTML = `<div class="avatar">${avatar}</div><div class="bubble">${escHtml(text)}</div>`;
   wrap.appendChild(div);
   wrap.scrollTop = wrap.scrollHeight;
   return div.querySelector('.bubble');
@@ -322,10 +359,10 @@ function appendMsg(role, text) {
 function appendThinking() {
   hideWelcome();
   const wrap = document.getElementById('messages');
-  const div = document.createElement('div');
-  div.className = 'msg ai';
-  div.id = 'thinking';
-  div.innerHTML = `<div class="avatar">🤖</div><div class="bubble"><div class="thinking"><span></span><span></span><span></span></div></div>`;
+  const div  = document.createElement('div');
+  div.className = 'msg ai'; div.id = 'thinking';
+  const avatar = MODES[mode]?.avatar || '🤖';
+  div.innerHTML = `<div class="avatar">${avatar}</div><div class="bubble"><div class="thinking"><span></span><span></span><span></span></div></div>`;
   wrap.appendChild(div);
   wrap.scrollTop = wrap.scrollHeight;
   return div;
@@ -336,18 +373,14 @@ function escHtml(s) {
 }
 
 function renderText(s) {
-  // code blocks
-  s = s.replace(/```(\w*)\n?([\s\S]*?)```/g, (_,lang,code) =>
-    `<pre><code>${escHtml(code.trim())}</code></pre>`);
-  // inline code
+  s = s.replace(/```(\w*)\n?([\s\S]*?)```/g, (_,l,c) => `<pre><code>${escHtml(c.trim())}</code></pre>`);
   s = s.replace(/`([^`]+)`/g, (_,c) => `<code>${escHtml(c)}</code>`);
-  // bold
   s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  // line breaks
   s = s.replace(/\n/g, '<br>');
   return s;
 }
 
+// ── Input auto-resize ──────────────────────────────────────────────────────
 const textarea = document.getElementById('input');
 textarea.addEventListener('input', () => {
   textarea.style.height = 'auto';
@@ -357,10 +390,11 @@ textarea.addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 });
 
+// ── Send message ───────────────────────────────────────────────────────────
 async function sendMessage() {
   if (streaming) return;
   const input = document.getElementById('input');
-  const msg = input.value.trim();
+  const msg   = input.value.trim();
   if (!msg) return;
 
   input.value = '';
@@ -371,30 +405,30 @@ async function sendMessage() {
   appendMsg('user', msg);
   const thinking = appendThinking();
 
-  const model = document.getElementById('modelSelect').value;
+  const cfg     = MODES[mode];
+  const model   = document.getElementById('modelSelect').value;
+  const headers = { 'Content-Type': 'application/json' };
+  if (erpToken) headers['Authorization'] = 'Bearer ' + erpToken;
+
+  // Agent mode: try ERP endpoint if token present, else room
+  const endpoint = (mode === 'agent' && erpToken) ? '/api/erp/chat' : cfg.endpoint;
 
   try {
-    const endpoint = mode === 'room' ? '/api/room/chat'
-                   : mode === 'erp'  ? '/api/erp/chat'
-                   : '/api/chat';
-    const headers = { 'Content-Type': 'application/json' };
-    if (mode === 'erp' && erpToken) headers['Authorization'] = 'Bearer ' + erpToken;
-
     const resp = await fetch(API + endpoint, {
-      method: 'POST',
-      headers,
+      method: 'POST', headers,
       body: JSON.stringify({ sessionId, userId, message: msg, model })
     });
 
     if (!resp.ok) {
-      if ((resp.status === 401 || resp.status === 403) && mode === 'erp') {
+      if ((resp.status === 401 || resp.status === 403) && mode === 'agent') {
         const body = await resp.json().catch(() => ({}));
         thinking.remove();
-        appendMsg('ai', `🔐 ${body.error || 'กรุณาเข้าสู่ระบบใหม่'}`);
+        appendMsg('ai', `🔐 ${body.error || 'กรุณาเข้าสู่ระบบ ERP ใหม่'}`);
         if (resp.status === 401) {
           erpToken = null;
           localStorage.removeItem('pai_erp_token');
-          setTimeout(() => setMode('erp'), 1500);
+          refreshErpTag();
+          setTimeout(() => setMode('agent'), 1500);
         }
         return;
       }
@@ -404,10 +438,9 @@ async function sendMessage() {
     thinking.remove();
     const bubble = appendMsg('ai', '');
 
-    const reader = resp.body.getReader();
+    const reader  = resp.body.getReader();
     const decoder = new TextDecoder();
-    let full = '';
-    let buf = '';
+    let full = '', buf = '';
 
     while (true) {
       const { done, value } = await reader.read();
@@ -415,25 +448,20 @@ async function sendMessage() {
       buf += decoder.decode(value, { stream: true });
       const lines = buf.split('\n');
       buf = lines.pop();
-
       for (const line of lines) {
         if (!line.startsWith('data: ')) continue;
         const data = line.slice(6).trim();
         if (data === '[DONE]') break;
         try {
-          const obj = JSON.parse(data);
+          const obj   = JSON.parse(data);
           const token = obj.Content ?? obj.content ?? obj.token ?? obj ?? '';
-          if (typeof token === 'string') {
-            full += token;
-            bubble.innerHTML = renderText(full);
-            document.getElementById('messages').scrollTop = 999999;
-          }
+          if (typeof token === 'string') { full += token; bubble.innerHTML = renderText(full); document.getElementById('messages').scrollTop = 999999; }
         } catch {}
       }
     }
 
     if (!full) bubble.innerHTML = '<em style="color:var(--muted)">ไม่ได้รับคำตอบ</em>';
-    bubble.innerHTML = renderText(full);
+    else bubble.innerHTML = renderText(full);
 
   } catch (e) {
     thinking.remove();
@@ -446,23 +474,6 @@ async function sendMessage() {
   }
 }
 
-// Show ERP user tag if token exists
-function refreshErpTag() {
-  const tag   = document.getElementById('erpUserTag');
-  const label = document.getElementById('erpUserLabel');
-  if (erpToken) {
-    try {
-      const payload = JSON.parse(atob(erpToken.split('.')[1]));
-      label.textContent = '🏭 ' + (payload.display_name || payload.username || 'ERP User');
-      tag.style.display = '';
-    } catch { tag.style.display = 'none'; }
-  } else {
-    tag.style.display = 'none';
-  }
-}
-refreshErpTag();
-
-// Poll health every 30s
 setInterval(checkHealth, 30000);
 </script>
 </body>
